@@ -20,7 +20,11 @@
             "args": [
                 "DEBUG=1"
             ],
-            "problemMatcher": []
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         },
         {
             "label": "make release",
@@ -29,11 +33,7 @@
             "args": [
                 "DEBUG=0"
             ],
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            "problemMatcher": []
         },
         {
             "label": "clean",
@@ -48,14 +48,10 @@
             ],
             "isBackground": false,
             "windows": {
-                "command": "C:/mGBA/mGBA.exe -g ${workspaceFolder}/${workspaceFolderBasename}.nds;sleep 5;echo debuggerReady"
+                "command": "C:/mGBA/mGBA.exe -g ${workspaceFolder}/${workspaceFolderBasename}.gba;sleep 5;echo debuggerReady"
             },
             "osx": {
-                "command": "/Applications/desmume.app/Contents/MacOS/desmume",
-                "args": [
-                    "-g",
-                    "${workspaceFolder}/${workspaceFolderBasename}.nds"
-                ]
+                "command": "open /Applications/mGBA.app --args -g ${workspaceFolder}/${workspaceFolderBasename}.gba;sleep 3;echo debuggerReady;echo debuggerReady"
             },
             "presentation": {
                 "clear": true,
@@ -63,19 +59,34 @@
                 "panel": "new"
             },
             "command": "debuggerReady",
-            "problemMatcher": {
-                "background": {
-                    "activeOnStart": true,
-                    "beginsPattern": "^.*debuggerReady.*$",
-                    "endsPattern": "^.*debuggerReady.*$"
+            "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                            "regexp": ".",
+                            "file": 1,
+                            "location": 2,
+                            "message": 3
+                        }
+                    ],
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^.*debuggerReady.*$",
+                        "endsPattern": "^.*debuggerReady.*$"
+                    }
                 }
-            }
+            ]
         },
         {
             "label": "run",
             "type": "shell",
             "isBackground": true,
-            "command": "C:/NO$GBADebugger/NO$GBA.exe  ${workspaceFolder}/${workspaceFolderBasename}.elf",
+            "windows": {
+                "command": "C:/NO$GBADebugger/NO$GBA.exe  ${workspaceFolder}/${workspaceFolderBasename}.elf",
+            },
+            "osx": {
+                "command": "open /Applications/mGBA.app --args ${workspaceFolder}/${workspaceFolderBasename}.gba"
+            },
             "problemMatcher": []
         }
     ]

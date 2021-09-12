@@ -4,16 +4,13 @@ This is a Renegade & Nekketsu Kouha Kunio-Kun - Arcade emulator for the GBA.
 It has no sound support.
 You should still be able to enjoy the game though. =)
 
-
 ## How to use:
 
 Now put renegade.zip, kuniokun.zip into a folder where you have arcade roms.
 
-When the emulator starts, you can either press L+R or tap on the screen to open
-up the menu (the emulator tries to load Green Beret automagically on startup).
-Now you can use the cross or touchscreen to navigate the menus, A or double tap
-to select an option, B or the top of the screen to go back a step.
-
+When the emulator starts, you press L+R to open up the menu (the emulator tries
+to load Renegade automagically on startup). Now you can use the cross to
+navigate the menus, A to select an option, B to go back a step.
 
 ## Menu:
 
