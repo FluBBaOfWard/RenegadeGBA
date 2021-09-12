@@ -1,0 +1,6 @@
+build
+include/renegade
+*.elf
+*.gba
+*.sav
+RenegadeGBA.xcodeproj/project.xcworkspace/xcuserdata

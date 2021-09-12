@@ -1,0 +1,23 @@
+RenegadeGBA To do
+------------------
+
+
+
+Misc:
+	Test dipswitches.
+	Test player 2.
+	Flip screen.
+
+Graphic:
+
+CPU:
+	Test decimal mode.
+
+GUI:
+
+Sound:
+	Add ADPCM emulation.
+	Add YM3526.
+
+Games:
+

@@ -1,0 +1,9 @@
+[submodule "source/RenegadeVideo"]
+	path = source/RenegadeVideo
+	url = https://github.com/FluBBaOfWard/RenegadeVideo.git
+[submodule "source/Shared"]
+	path = source/Shared
+	url = https://github.com/FluBBaOfWard/GBA_Shared.git
+[submodule "source/ARM6502"]
+	path = source/ARM6502
+	url = https://github.com/FluBBaOfWard/ARM6502.git
