@@ -1,4 +1,4 @@
-# RenegadeGBA V0.1.0
+# RenegadeGBA V0.1.1
 
 This is a Renegade & Nekketsu Kouha Kunio-Kun - Arcade emulator for the GBA.
 It has no sound support.
