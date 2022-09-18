@@ -57,11 +57,12 @@ runStart:
 ;@----------------------------------------------------------------------------
 reFrameLoop:
 ;@----------------------------------------------------------------------------
+	mov r0,#CYCLE_PSL
+	bl m6502RunXCycles
 	ldr reptr,=reVideo_0
 	bl doScanline
 	cmp r0,#0
-	movne r0,#CYCLE_PSL
-	bne m6502RunXCycles
+	bne reFrameLoop
 	b reEnd
 ;@----------------------------------------------------------------------------
 
@@ -134,11 +135,7 @@ cpuReset:		;@ Called by loadCart/resetGame
 	adr r4,cpuMapData
 	bl mapM6502Memory
 
-	ldr r0,=reFrameLoop
-	str r0,[m6502optbl,#m6502NextTimeout]
-	str r0,[m6502optbl,#m6502NextTimeout_]
-
-	mov r0,#0
+	mov r0,m6502optbl
 	bl m6502Reset
 
 //	adr r0,bvcHack
