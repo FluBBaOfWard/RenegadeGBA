@@ -11,7 +11,7 @@
 #include "Shared/EmuSettings.h"
 #include "Emubase.h"
 #include "Main.h"
-#include "GUI.h"
+#include "Gui.h"
 #include "Renegade.h"
 #include "Cart.h"
 #include "Gfx.h"
@@ -26,20 +26,6 @@ static int selectedGame = 0;
 static bool loadRoms(int gamenr, bool doLoad);
 
 #define GAMECOUNT (3)
-static const int gameCount = GAMECOUNT;
-static const char *const gameNames[GAMECOUNT] = {"renegade","kuniokun","kuniokunb"};
-static const char *const gameZipNames[GAMECOUNT] = {"renegade.zip","kuniokun.zip","kuniokunb.zip"};
-static const int fileCount[GAMECOUNT] = {25,25,25};
-static const char *const romFilenames[GAMECOUNT][25] = {
-	{"na-5.ic52","nb-5.ic51",     "n0-5.ic13", "nc-5.bin",    "n1-5.ic1","n2-5.ic14","n6-5.ic28","n7-5.ic27","n8-5.ic26","n9-5.ic25",           "nh-5.bin","nn-5.bin","ni-5.bin","no-5.bin","nd-5.bin","nj-5.bin","ne-5.bin","nk-5.bin","nf-5.bin","nl-5.bin","ng-5.bin","nm-5.bin",                                     "n5-5.ic31","n4-5.ic32","n3-5.ic33"},
-	{"ta18-11.bin","nb-01.bin",   "n0-5.bin",  "ta18-25.bin", "ta18-01.bin","ta18-06.bin","n7-5.bin","ta18-02.bin","ta18-04.bin","ta18-03.bin", "ta18-20.bin","ta18-14.bin","ta18-19.bin","ta18-13.bin","ta18-24.bin","ta18-18.bin","ta18-23.bin","ta18-17.bin","ta18-22.bin","ta18-16.bin","ta18-21.bin","ta18-15.bin", "ta18-07.bin","ta18-08.bin","ta18-09.bin"},
-	{"ta18-11.bin","ta18-10.bin", "n0-5.bin",  "ta18-25.bin", "ta18-01.bin","ta18-06.bin","n7-5.bin","ta18-02.bin","ta18-04.bin","ta18-03.bin", "ta18-20.bin","ta18-14.bin","ta18-19.bin","ta18-13.bin","ta18-24.bin","ta18-18.bin","ta18-23.bin","ta18-17.bin","ta18-22.bin","ta18-16.bin","ta18-21.bin","ta18-15.bin", "ta18-07.bin","ta18-08.bin","ta18-09.bin"}
-};
-static const int romFilesizes[GAMECOUNT][25] = {
-	{0x8000,0x8000, 0x8000, 0x8000, 0x8000,0x8000,0x8000,0x8000,0x8000,0x8000, 0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000, 0x8000,0x8000,0x8000},
-	{0x8000,0x8000, 0x8000, 0x8000, 0x8000,0x8000,0x8000,0x8000,0x8000,0x8000, 0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000, 0x8000,0x8000,0x8000},
-	{0x8000,0x8000, 0x8000, 0x8000, 0x8000,0x8000,0x8000,0x8000,0x8000,0x8000, 0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000,0x8000, 0x8000,0x8000,0x8000}
-};
 
 //---------------------------------------------------------------------------------
 int loadSettings() {
@@ -61,15 +47,15 @@ int loadSettings() {
 		return 1;
 	}
 */
-	g_dipSwitch0 = cfg.dipSwitch0;
-	g_dipSwitch1 = cfg.dipSwitch1;
-	g_dipSwitch2 = cfg.dipSwitch2;
+	gDipSwitch0 = cfg.dipSwitch0;
+	gDipSwitch1 = cfg.dipSwitch1;
+	gDipSwitch2 = cfg.dipSwitch2;
 	gScaling    = cfg.scaling & 1;
 	gFlicker    = cfg.flicker & 1;
 	gGammaValue = cfg.gammaValue;
-	emuSettings  = cfg.emuSettings &~ EMUSPEED_MASK; // Clear speed setting.
-	sleepTime    = cfg.sleepTime;
-	joyCfg       = (joyCfg & ~0x400)|((cfg.controller&1)<<10);
+	emuSettings = cfg.emuSettings &~ EMUSPEED_MASK; // Clear speed setting.
+	sleepTime   = cfg.sleepTime;
+	joyCfg      = (joyCfg & ~0x400)|((cfg.controller&1)<<10);
 //	strlcpy(currentDir, cfg.currentPath, sizeof(currentDir));
 
 	infoOutput("Settings loaded.");
@@ -79,9 +65,9 @@ void saveSettings() {
 //	FILE *file;
 
 	strcpy(cfg.magic,"cfg");
-	cfg.dipSwitch0  = g_dipSwitch0;
-	cfg.dipSwitch1  = g_dipSwitch1;
-	cfg.dipSwitch2  = g_dipSwitch2;
+	cfg.dipSwitch0  = gDipSwitch0;
+	cfg.dipSwitch1  = gDipSwitch1;
+	cfg.dipSwitch2  = gDipSwitch2;
 	cfg.scaling     = gScaling & 1;
 	cfg.flicker     = gFlicker & 1;
 	cfg.gammaValue  = gGammaValue;

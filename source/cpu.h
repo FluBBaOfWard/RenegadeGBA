@@ -5,11 +5,15 @@
 extern "C" {
 #endif
 
+#include "ARM6502/M6502.h"
+
+extern M6502Core m6502Base;
 extern u8 waitMaskIn;
 extern u8 waitMaskOut;
 
-void cpuReset(void);
 void run(void);
+void stepFrame(void);
+void cpuReset(void);
 
 #ifdef __cplusplus
 } // extern "C"

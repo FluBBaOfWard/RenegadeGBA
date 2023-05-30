@@ -1,7 +1,7 @@
 #ifdef __arm__
 
 #include "Shared/gba_asm.h"
-#include "Equates.h"
+#include "Shared/EmuSettings.h"
 #include "ARM6502/M6502.i"
 #include "RenegadeVideo/RenegadeVideo.i"
 
@@ -154,7 +154,7 @@ machineInit: 	;@ Called from C
 	bl gfxInit
 //	bl ioInit
 	bl soundInit
-//	bl cpuInit
+	bl cpuInit
 
 	ldmfd sp!,{lr}
 	bx lr
@@ -262,8 +262,6 @@ moveLoop:
 
 	ldmfd sp!,{r3-r6,pc}
 
-
-
 ;@----------------------------------------------------------------------------
 //	.section itcm
 ;@----------------------------------------------------------------------------
@@ -271,10 +269,10 @@ moveLoop:
 ;@----------------------------------------------------------------------------
 m6502Mapper0:
 ;@----------------------------------------------------------------------------
-	stmfd sp!,{m6502optbl,lr}
-	ldr m6502optbl,=m6502OpTable
+	stmfd sp!,{m6502ptr,lr}
+	ldr m6502ptr,=m6502Base
 	bl m6502Mapper
-	ldmfd sp!,{m6502optbl,pc}
+	ldmfd sp!,{m6502ptr,pc}
 ;@----------------------------------------------------------------------------
 m6502Mapper:		;@ Rom paging..
 ;@----------------------------------------------------------------------------
@@ -290,9 +288,9 @@ m6502Mapper:		;@ Rom paging..
 	cmp r1,#0x88
 	movmi r5,#12
 
-	add r6,m6502optbl,#m6502ReadTbl
-	add r7,m6502optbl,#m6502WriteTbl
-	add r8,m6502optbl,#m6502MemTbl
+	add r6,m6502ptr,#m6502ReadTbl
+	add r7,m6502ptr,#m6502WriteTbl
+	add r8,m6502ptr,#m6502MemTbl
 	b m6502MemAps
 m6502MemApl:
 	add r6,r6,#4
@@ -321,7 +319,7 @@ romNum:
 	.long 0						;@ RomNumber
 romInfo:						;@ Keep emuflags/BGmirror together for savestate/loadstate
 emuFlags:
-	.byte 0						;@ EmuFlags      (label this so UI.C can take a peek) see equates.h for bitfields
+	.byte 0						;@ EmuFlags      (label this so Gui.c can take a peek) see EmuSettings.h for bitfields
 	.byte SCALED				;@ (display type)
 	.byte 0,0					;@ (sprite follow val)
 cartFlags:

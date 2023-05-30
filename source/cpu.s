@@ -6,12 +6,15 @@
 
 #define CYCLE_PSL (96)
 
-	.global cpuReset
 	.global run
+	.global stepFrame
+	.global cpuInit
+	.global cpuReset
 	.global frameTotal
 	.global waitMaskIn
 	.global waitMaskOut
 
+	.global m6502Base
 
 	.syntax unified
 	.arm
@@ -19,7 +22,7 @@
 	.section .ewram,"ax"
 	.align 2
 ;@----------------------------------------------------------------------------
-run:		;@ Return after 1 frame
+run:						;@ Return after X frame(s)
 	.type   run STT_FUNC
 ;@----------------------------------------------------------------------------
 	ldrh r0,waitCountIn
@@ -48,8 +51,8 @@ runStart:
 
 	bl refreshEMUjoypads		;@ Z=1 if communication ok
 
-	ldr m6502optbl,=m6502OpTable
-	add r0,m6502optbl,#m6502Regs
+	ldr m6502ptr,=m6502Base
+	add r0,m6502ptr,#m6502Regs
 	ldmia r0,{m6502nz-m6502pc,m6502zpage}	;@ Restore M6502 state
 	b reFrameLoop
 
@@ -68,8 +71,8 @@ reFrameLoop:
 
 	.section .ewram,"ax"
 reEnd:
-	add r0,m6502optbl,#m6502Regs
-	stmia r0,{m6502nz-m6502pc,m6502zpage}	;@ Save M6502 state
+	add r0,m6502ptr,#m6502Regs
+	stmia r0,{m6502nz-m6502pc}	;@ Save M6502 state
 
 	ldr r1,=fpsValue
 	ldr r0,[r1]
@@ -90,11 +93,40 @@ reEnd:
 
 ;@----------------------------------------------------------------------------
 cyclesPerScanline:	.long 0
-frameTotal:			.long 0		;@ Let ui.c see frame count for savestates
+frameTotal:			.long 0		;@ Let Gui.c see frame count for savestates
 waitCountIn:		.byte 0
 waitMaskIn:			.byte 0
 waitCountOut:		.byte 0
 waitMaskOut:		.byte 0
+
+;@----------------------------------------------------------------------------
+stepFrame:					;@ Return after 1 frame
+	.type   stepFrame STT_FUNC
+;@----------------------------------------------------------------------------
+	stmfd sp!,{r4-r11,lr}
+
+	ldr m6502ptr,=m6502Base
+	add r0,m6502ptr,#m6502Regs
+	ldmia r0,{m6502nz-m6502pc,m6502zpage}	;@ Restore M6502 state
+;@----------------------------------------------------------------------------
+reStepLoop:
+;@----------------------------------------------------------------------------
+	mov r0,#CYCLE_PSL
+	bl m6502RunXCycles
+	ldr reptr,=reVideo_0
+	bl doScanline
+	cmp r0,#0
+	bne reStepLoop
+;@----------------------------------------------------------------------------
+	add r0,m6502ptr,#m6502Regs
+	stmia r0,{m6502nz-m6502pc}	;@ Save M6502 state
+
+	ldr r1,frameTotal
+	add r1,r1,#1
+	str r1,frameTotal
+
+	ldmfd sp!,{r4-r11,lr}
+	bx lr
 
 ;@----------------------------------------------------------------------------
 bvcHack:		;@ BNE -5 (0x50 0xFB), menu speed hack.
@@ -121,6 +153,10 @@ bneHack:		;@ BNE -4 (0xD0 0xFC), gameplay speed hack.
 skipBne:
 	fetch 2
 ;@----------------------------------------------------------------------------
+cpuInit:
+	ldr r0,=m6502Base
+	b m6502Init
+;@----------------------------------------------------------------------------
 cpuReset:		;@ Called by loadCart/resetGame
 ;@----------------------------------------------------------------------------
 	stmfd sp!,{lr}
@@ -130,18 +166,18 @@ cpuReset:		;@ Called by loadCart/resetGame
 	str r0,cyclesPerScanline
 
 ;@--------------------------------------
-	ldr m6502optbl,=m6502OpTable
+	ldr m6502ptr,=m6502Base
 
 	adr r4,cpuMapData
 	bl mapM6502Memory
 
-	mov r0,m6502optbl
+	mov r0,m6502ptr
 	bl m6502Reset
 
 //	adr r0,bvcHack
-//	str r0,[m6502optbl,#0x50*4]
+//	str r0,[m6502ptr,#0x50*4]
 	adr r0,bneHack
-	str r0,[m6502optbl,#0xD0*4]
+	str r0,[m6502ptr,#0xD0*4]
 
 	ldmfd sp!,{lr}
 	bx lr
@@ -171,6 +207,17 @@ m6502DataLoop:
 	movs r5,r5,lsr#1
 	bne m6502DataLoop
 	ldmfd sp!,{pc}
+;@----------------------------------------------------------------------------
+#ifdef NDS
+	.section .dtcm, "ax", %progbits			;@ For the NDS
+#elif GBA
+	.section .iwram, "ax", %progbits		;@ For the GBA
+#else
+	.section .text
+#endif
+;@----------------------------------------------------------------------------
+m6502Base:
+	.space m6502Size
 ;@----------------------------------------------------------------------------
 	.end
 #endif // #ifdef __arm__

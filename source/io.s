@@ -11,10 +11,10 @@
 
 	.global joyCfg
 	.global EMUinput
-	.global g_dipSwitch0
-	.global g_dipSwitch1
-	.global g_dipSwitch2
-	.global g_dipSwitch3
+	.global gDipSwitch0
+	.global gDipSwitch1
+	.global gDipSwitch2
+	.global gDipSwitch3
 	.global coinCounter0
 	.global coinCounter1
 
@@ -59,14 +59,13 @@ refreshEMUjoypads:			;@ Call every frame
 	orrne r0,r0,#0x20			;@ Button 2 (jmp)
 	tst r1,#0x01				;@ A
 	mov r3,#0
-	orrne r3,r3,#0x04			;@ Button 4 (atk right)
+	orrne r3,r3,#0x04			;@ Button 3 (atk right)
 
 	mov r1,#0
 	tst r4,#0x4					;@ Select
 	orrne r1,r1,#0x40			;@ Coin 1
 	tst r4,#0x8					;@ Start
 	orrne r1,r1,#0x4000			;@ Start 1
-//	orrne r1,r1,#0x20			;@ Coin 2
 	tst r2,#0x20000000			;@ Player2?
 	mov r2,#0
 	movne r1,r1,lsl#1
@@ -78,13 +77,8 @@ refreshEMUjoypads:			;@ Call every frame
 
 	strb r0,joy0State
 	strb r2,joy1State
-
 	and r3,r3,#0x0C				;@ Attack right, P1/P2
 	strb r3,joy2State
-	ldrb r1,g_dipSwitch2
-	bic r1,r1,#0x0C
-	orr r1,r1,r3
-	strb r1,g_dipSwitch2
 	bx lr
 
 joyCfg: .long 0x00ff01ff	;@ byte0=auto mask, byte1=(saves R), byte2=R auto mask
@@ -96,10 +90,10 @@ joy1State:	.byte 0
 joy2State:	.byte 0
 rlud2lrud:		.byte 0x00,0x01,0x02,0x03, 0x04,0x05,0x06,0x07, 0x08,0x09,0x0a,0x0b, 0x0c,0x0d,0x0e,0x0f
 rlud2lrud180:	.byte 0x00,0x02,0x01,0x03, 0x08,0x0a,0x09,0x0b, 0x04,0x06,0x05,0x07, 0x0c,0x0e,0x0d,0x0f
-g_dipSwitch0:	.byte 0
-g_dipSwitch1:	.byte 0x50		;@ Lives, cabinet & demo sound.
-g_dipSwitch2:	.byte 0
-g_dipSwitch3:	.byte 0
+gDipSwitch0:	.byte 0
+gDipSwitch1:	.byte 0x50		;@ Coins, lives, bonus, cabinet & flip.
+gDipSwitch2:	.byte 0
+gDipSwitch3:	.byte 0
 coinCounter0:	.long 0
 coinCounter1:	.long 0
 
@@ -116,8 +110,21 @@ Input0_R:		;@ Player 1 + Start
 ;@----------------------------------------------------------------------------
 Input1_R:		;@ Player 2 + Coin
 ;@----------------------------------------------------------------------------
-;@	mov r11,r11					;@ No$GBA breakpoint
 	ldrb r0,joy1State
+	eor r0,r0,#0xFF
+	bx lr
+;@----------------------------------------------------------------------------
+Input2_R:		;@ Coin setting, Service, mcu, VBlank & attack right.
+;@----------------------------------------------------------------------------
+	ldrb r0,gDipSwitch2
+	ldrb r1,joy2State
+	orr r0,r0,r1
+	eor r0,r0,#0x9F
+	bx lr
+;@----------------------------------------------------------------------------
+Input3_R:
+;@----------------------------------------------------------------------------
+	ldrb r0,gDipSwitch1
 	eor r0,r0,#0xFF
 	bx lr
 
@@ -125,22 +132,6 @@ Input1_R:		;@ Player 2 + Coin
 	.section .iwram, "ax", %progbits	;@ For the GBA
 	.align 2
 #endif
-;@----------------------------------------------------------------------------
-Input2_R:		;@ Coin setting, Service, mcu, VBlank & attack right.
-;@----------------------------------------------------------------------------
-	ldr r0,=g_dipSwitch2
-	ldrb r0,[r0]
-//	eor r0,r0,#0x60				;@ why? MAME says ACTIVE_LOW...
-	eor r0,r0,#0x9F
-	bx lr
-;@----------------------------------------------------------------------------
-Input3_R:
-;@----------------------------------------------------------------------------
-	ldr r0,=g_dipSwitch1
-	ldrb r0,[r0]
-	eor r0,r0,#0xFF
-	bx lr
-
 ;@----------------------------------------------------------------------------
 IO_R:				;@ I/O read, 0x2000-0x3FFFF
 ;@----------------------------------------------------------------------------
@@ -163,16 +154,16 @@ IO_R:				;@ I/O read, 0x2000-0x3FFFF
 More_IO_R:			;@ Ram,
 ;@----------------------------------------------------------------------------
 	cmp addy,#0x3200
+	movpl r0,#0
 	ldrbmi r0,[m6502zpage,addy]
-	bxmi lr
-	b empty_IO_R
+	bx lr
 
 ;@----------------------------------------------------------------------------
 IO_W:				;@ I/O write, 0x2000-0x3FFFF
 ;@----------------------------------------------------------------------------
 
 	cmp addy,#0x3200
-	bmi ram6502W
+	bmi ram6502IOW
 	subs r1,addy,#0x3800
 	ldrpl reptr,=reVideo_0
 	bpl reIOWrite

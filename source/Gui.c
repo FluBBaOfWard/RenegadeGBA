@@ -1,6 +1,6 @@
 #include <gba.h>
 
-#include "GUI.h"
+#include "Gui.h"
 #include "Shared/EmuMenu.h"
 #include "Shared/EmuSettings.h"
 #include "Main.h"
@@ -8,26 +8,29 @@
 #include "Cart.h"
 #include "Gfx.h"
 #include "io.h"
+#include "cpu.h"
 #include "ARM6502/Version.h"
 #include "RenegadeVideo/Version.h"
 
-#define EMUVERSION "V0.1.1 2022-09-18"
+#define EMUVERSION "V0.1.1 2023-05-30"
 
-const fptr fnMain[] = {nullUI, subUI, subUI, subUI, subUI, subUI, subUI, subUI, subUI};
+static void uiDebug(void);
+
+const fptr fnMain[] = {nullUI, subUI, subUI, subUI, subUI, subUI, subUI, subUI, subUI, subUI};
 
 const fptr fnList0[] = {uiDummy};
-const fptr fnList1[] = {ui2, ui3, ui4, ui5, ui6, ui7, gbaSleep, resetGame};
-const fptr fnList2[] = {ui8, loadState, saveState, saveSettings, resetGame};
+const fptr fnList1[] = {ui2, ui3, ui4, ui5, ui6, ui7, ui8, gbaSleep, resetGame};
+const fptr fnList2[] = {ui9, loadState, saveState, saveSettings, resetGame};
 const fptr fnList3[] = {autoBSet, autoASet, controllerSet, swapABSet};
 const fptr fnList4[] = {scalingSet, flickSet, gammaSet, fgrLayerSet, bgrLayerSet, sprLayerSet};
-const fptr fnList5[] = {speedSet, autoStateSet, autoSettingsSet, autoPauseGameSet, debugTextSet, sleepSet};
-const fptr fnList6[] = {coinASet, coinBSet, difficultSet, livesSet, bonusSet, cabinetSet, flipSet};
-const fptr fnList7[] = {uiDummy};
-const fptr fnList8[] = {quickSelectGame, quickSelectGame, quickSelectGame, quickSelectGame};
-const fptr *const fnListX[] = {fnList0, fnList1, fnList2, fnList3, fnList4, fnList5, fnList6, fnList7, fnList8};
-const u8 menuXItems[] = {ARRSIZE(fnList0), ARRSIZE(fnList1), ARRSIZE(fnList2), ARRSIZE(fnList3), ARRSIZE(fnList4), ARRSIZE(fnList5), ARRSIZE(fnList6), ARRSIZE(fnList7), ARRSIZE(fnList8)};
-const fptr drawUIX[] = {uiNullNormal, uiMainMenu, uiFile, uiController, uiDisplay, uiSettings, uiDipswitches, uiAbout, uiLoadGame};
-const u8 menuXBack[] = {0,0,1,1,1,1,1,1,2};
+const fptr fnList5[] = {speedSet, autoStateSet, autoSettingsSet, autoPauseGameSet, ewramSet, sleepSet};
+const fptr fnList6[] = {debugTextSet, fgrLayerSet, bgrLayerSet, sprLayerSet, stepFrame};
+const fptr fnList7[] = {coinASet, coinBSet, difficultSet, livesSet, bonusSet, cabinetSet, flipSet};
+const fptr fnList8[] = {uiDummy};
+const fptr fnList9[] = {quickSelectGame, quickSelectGame, quickSelectGame, quickSelectGame};
+const fptr *const fnListX[] = {fnList0, fnList1, fnList2, fnList3, fnList4, fnList5, fnList6, fnList7, fnList8, fnList9};
+const u8 menuXItems[] = {ARRSIZE(fnList0), ARRSIZE(fnList1), ARRSIZE(fnList2), ARRSIZE(fnList3), ARRSIZE(fnList4), ARRSIZE(fnList5), ARRSIZE(fnList6), ARRSIZE(fnList7), ARRSIZE(fnList8), ARRSIZE(fnList9)};
+const fptr drawUIX[] = {uiNullNormal, uiMainMenu, uiFile, uiController, uiDisplay, uiSettings, uiDebug, uiDipswitches, uiAbout, uiLoadGame};
 
 u8 gGammaValue;
 
@@ -88,6 +91,7 @@ void uiMainMenu() {
 	drawMenuItem("Controller->");
 	drawMenuItem("Display->");
 	drawMenuItem("Settings->");
+	drawMenuItem("Debug->");
 	drawMenuItem("DipSwitches->");
 	drawMenuItem("Help->");
 	drawMenuItem("Sleep");
@@ -124,9 +128,6 @@ void uiDisplay() {
 	drawSubItem("Display: ", dispTxt[gScaling]);
 	drawSubItem("Scaling: ", flickTxt[gFlicker]);
 	drawSubItem("Gamma: ", brighTxt[gGammaValue]);
-	drawSubItem("Disable Foreground: ", autoTxt[gGfxMask&1]);
-	drawSubItem("Disable Background: ", autoTxt[(gGfxMask>>1)&1]);
-	drawSubItem("Disable Sprites: ", autoTxt[(gGfxMask>>4)&1]);
 }
 
 void uiSettings() {
@@ -135,20 +136,29 @@ void uiSettings() {
 	drawSubItem("Autoload State: ", autoTxt[(emuSettings>>2)&1]);
 	drawSubItem("Autosave Settings: ", autoTxt[(emuSettings>>9)&1]);
 	drawSubItem("Autopause Game: ", autoTxt[emuSettings&1]);
-	drawSubItem("Debug Output: ", autoTxt[gDebugSet&1]);
+	drawSubItem("EWRAM Overclock: ", autoTxt[ewram&1]);
 	drawSubItem("Autosleep: ", sleepTxt[(emuSettings>>4)&3]);
+}
+
+void uiDebug() {
+	setupSubMenu("Debug");
+	drawSubItem("Debug Output:", autoTxt[gDebugSet&1]);
+	drawSubItem("Disable Foreground:", autoTxt[gGfxMask&1]);
+	drawSubItem("Disable Background:", autoTxt[(gGfxMask>>1)&1]);
+	drawSubItem("Disable Sprites:", autoTxt[(gGfxMask>>4)&1]);
+	drawSubItem("Step Frame", NULL);
 }
 
 void uiDipswitches() {
 	char s[10];
 	setupSubMenu("Dipswitch Settings");
-	drawSubItem("Coin A: ", coinTxt[g_dipSwitch1 & 0x3]);
-	drawSubItem("Coin B: ", coinTxt[(g_dipSwitch1>>2) & 0x3]);
-	drawSubItem("Difficulty: ", diffTxt[g_dipSwitch2 & 3]);
-	drawSubItem("Lives: ", livesTxt[(g_dipSwitch1>>4) & 1]);
-	drawSubItem("Bonus: ", bonusTxt[(g_dipSwitch1>>5) & 1]);
-	drawSubItem("Cabinet: ", cabTxt[(g_dipSwitch1>>6) & 1]);
-	drawSubItem("Flip Screen: ", autoTxt[(g_dipSwitch1>>7) & 1]);
+	drawSubItem("Coin A: ", coinTxt[gDipSwitch1 & 0x3]);
+	drawSubItem("Coin B: ", coinTxt[(gDipSwitch1>>2) & 0x3]);
+	drawSubItem("Difficulty: ", diffTxt[gDipSwitch2 & 3]);
+	drawSubItem("Lives: ", livesTxt[(gDipSwitch1>>4) & 1]);
+	drawSubItem("Bonus: ", bonusTxt[(gDipSwitch1>>5) & 1]);
+	drawSubItem("Cabinet: ", cabTxt[(gDipSwitch1>>6) & 1]);
+	drawSubItem("Flip Screen: ", autoTxt[(gDipSwitch1>>7) & 1]);
 
 	setMenuItemRow(15);
 	int2Str(coinCounter0, s);
@@ -217,32 +227,32 @@ void sprLayerSet(){
 
 /// Number of coins for credits
 void coinASet() {
-	int i = (g_dipSwitch1+1) & 0x3;
-	g_dipSwitch1 = (g_dipSwitch1 & ~0x3) | i;
+	int i = (gDipSwitch1+1) & 0x3;
+	gDipSwitch1 = (gDipSwitch1 & ~0x3) | i;
 }
 /// Number of coins for credits
 void coinBSet() {
-	int i = (g_dipSwitch1+4) & 0xC;
-	g_dipSwitch1 = (g_dipSwitch1 & ~0xC) | i;
+	int i = (gDipSwitch1+4) & 0xC;
+	gDipSwitch1 = (gDipSwitch1 & ~0xC) | i;
 }
 /// Game difficulty
 void difficultSet() {
-	int i = (g_dipSwitch2+0x01) & 0x03;
-	g_dipSwitch2 = (g_dipSwitch2 & ~0x03) | i;
+	int i = (gDipSwitch2+0x01) & 0x03;
+	gDipSwitch2 = (gDipSwitch2 & ~0x03) | i;
 }
 /// Number of lifes to start with
 void livesSet() {
-	g_dipSwitch1 ^= 0x10;
+	gDipSwitch1 ^= 0x10;
 }
 /// At which score you get bonus lifes
 void bonusSet() {
-	g_dipSwitch1 ^= 0x20;
+	gDipSwitch1 ^= 0x20;
 }
 /// Cocktail/upright
 void cabinetSet() {
-	g_dipSwitch1 ^= 0x40;
+	gDipSwitch1 ^= 0x40;
 }
 /// Flip screen
 void flipSet() {
-	g_dipSwitch1 ^= 0x80;
+	gDipSwitch1 ^= 0x80;
 }

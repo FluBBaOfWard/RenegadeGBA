@@ -1,6 +1,16 @@
 #ifndef EMUBASE
 #define EMUBASE
 
+typedef struct {
+	const u32 identifier;
+	const u32 filesize;
+	const u32 flags;
+	const u32 spritefollow;
+	const u8 bios;				// Bit 0 = Bios,
+	const u8 reserved[15];
+	const char name[32];
+} RomHeader;
+
 typedef struct {				//(config struct)
 	char magic[4];				//="CFG",0
 	int emuSettings;
