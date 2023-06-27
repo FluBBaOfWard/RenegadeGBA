@@ -2,9 +2,10 @@ RenegadeGBA revision history
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 
-V0.1.1 - 2023-05-30 (FluBBa)
+V0.1.1 - 2023-06-27 (FluBBa)
 	Added new debug menu.
 	Better menu traversing.
+	Updated cpu core.
 
 V0.1.0 - 2021-03-17 (FluBBa)
 	Added load/save state.

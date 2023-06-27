@@ -174,10 +174,13 @@ cpuReset:		;@ Called by loadCart/resetGame
 	mov r0,m6502ptr
 	bl m6502Reset
 
-//	adr r0,bvcHack
-//	str r0,[m6502ptr,#0x50*4]
-	adr r0,bneHack
-	str r0,[m6502ptr,#0xD0*4]
+	mov r0,m6502ptr
+//	mov r1,#0x50
+//	adr r2,bvcHack
+//	bl m6502PatchOpcode
+	mov r1,#0xD0
+	adr r2,bneHack
+	bl m6502PatchOpcode
 
 	ldmfd sp!,{lr}
 	bx lr
