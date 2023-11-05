@@ -4,23 +4,23 @@
 #include "Shared/EmuSettings.h"
 #include "RenegadeVideo/RenegadeVideo.i"
 
+	.global gFlicker
+	.global gTwitch
+	.global gScaling
+	.global gGfxMask
+	.global yStart
+	.global gfxState
+//	.global oamBufferReady
+	.global EMUPALBUFF
+	.global reVideo_0
+
 	.global gfxInit
 	.global gfxReset
 	.global paletteInit
 	.global paletteTxAll
 	.global refreshGfx
 	.global endFrame
-	.global gfxState
-//	.global oamBufferReady
-	.global gFlicker
-	.global gTwitch
-	.global gScaling
-	.global gGfxMask
 	.global vblIrqHandler
-	.global yStart
-	.global EMUPALBUFF
-
-	.global reVideo_0
 
 
 	.syntax unified

@@ -6,15 +6,16 @@
 
 #define CYCLE_PSL (96)
 
+	.global frameTotal
+	.global waitMaskIn
+	.global waitMaskOut
+	.global m6502Base
+
 	.global run
 	.global stepFrame
 	.global cpuInit
 	.global cpuReset
-	.global frameTotal
-	.global waitMaskIn
-	.global waitMaskOut
 
-	.global m6502Base
 
 	.syntax unified
 	.arm

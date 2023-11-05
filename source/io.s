@@ -4,11 +4,6 @@
 #include "ARM6502/M6502.i"
 #include "RenegadeVideo/RenegadeVideo.i"
 
-	.global ioReset
-	.global IO_R
-	.global IO_W
-	.global refreshEMUjoypads
-
 	.global joyCfg
 	.global EMUinput
 	.global gDipSwitch0
@@ -17,6 +12,11 @@
 	.global gDipSwitch3
 	.global coinCounter0
 	.global coinCounter1
+
+	.global ioReset
+	.global refreshEMUjoypads
+	.global IO_R
+	.global IO_W
 
 	.syntax unified
 	.arm

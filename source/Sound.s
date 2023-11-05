@@ -5,6 +5,8 @@
 
 #define MIX_LEN (528)
 
+	.extern pauseEmulation
+
 	.global soundInit
 	.global soundReset
 	.global vblSound1
@@ -12,8 +14,6 @@
 	.global setMuteSoundGUI
 	.global setMuteSoundGame
 	.global SN_0_W
-
-	.extern pauseEmulation
 
 
 	.syntax unified

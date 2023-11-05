@@ -5,23 +5,22 @@
 #include "ARM6502/M6502.i"
 #include "RenegadeVideo/RenegadeVideo.i"
 
-	.global machineInit
-	.global loadCart
-	.global m6502Mapper
-	.global m6502Mapper0
 	.global romNum
 	.global emuFlags
 	.global cartFlags
 	.global romStart
+	.global EMU_RAM
+	.global ROM_Space
+	.global testState
 	.global vromBase0
 	.global vromBase1
 	.global vromBase2
 	.global adpcmBase
 
-	.global EMU_RAM
-	.global ROM_Space
-	.global testState
-
+	.global machineInit
+	.global loadCart
+	.global m6502Mapper
+	.global m6502Mapper0
 
 
 	.syntax unified
