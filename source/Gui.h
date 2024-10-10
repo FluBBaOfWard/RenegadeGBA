@@ -25,22 +25,6 @@ void uiSettings(void);
 void uiDipswitches(void);
 void uiLoadGame(void);
 
-void controllerSet(void);
-void swapABSet(void);
-
-void scalingSet(void);
-void gammaSet(void);
-void fgrLayerSet(void);
-void bgrLayerSet(void);
-void sprLayerSet(void);
-
-void coinASet(void);
-void coinBSet(void);
-void difficultSet(void);
-void livesSet(void);
-void bonusSet(void);
-void cabinetSet(void);
-void flipSet(void);
 
 #ifdef __cplusplus
 } // extern "C"
