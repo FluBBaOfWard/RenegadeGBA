@@ -20,7 +20,11 @@
 	.syntax unified
 	.arm
 
-	.section .ewram,"ax"
+#ifdef GBA
+	.section .ewram, "ax", %progbits	;@ For the GBA
+#else
+	.section .text						;@ For anything else
+#endif
 	.align 2
 ;@----------------------------------------------------------------------------
 run:						;@ Return after X frame(s)
@@ -130,7 +134,7 @@ reStepLoop:
 	bx lr
 
 ;@----------------------------------------------------------------------------
-bvcHack:		;@ BNE -5 (0x50 0xFB), menu speed hack.
+bvcHack:		;@ BVC -5 (0x50 0xFB), menu speed hack.
 ;@----------------------------------------------------------------------------
 	ldrsb r0,[m6502pc],#1
 	tst cycles,#CYC_V
@@ -213,12 +217,13 @@ m6502DataLoop:
 	ldmfd sp!,{pc}
 ;@----------------------------------------------------------------------------
 #ifdef NDS
-	.section .dtcm, "ax", %progbits			;@ For the NDS
+	.section .sbss				;@ This is DTCM on NDS with devkitARM
 #elif GBA
-	.section .iwram, "ax", %progbits		;@ For the GBA
+	.section .bss				;@ This is IWRAM on GBA with devkitARM
 #else
-	.section .text
+	.section .bss
 #endif
+	.align 2
 ;@----------------------------------------------------------------------------
 m6502Base:
 	.space m6502Size

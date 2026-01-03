@@ -19,7 +19,11 @@
 	.syntax unified
 	.arm
 
-	.section .ewram,"ax"
+#ifdef GBA
+	.section .ewram, "ax", %progbits	;@ For the GBA
+#else
+	.section .text						;@ For anything else
+#endif
 	.align 2
 ;@----------------------------------------------------------------------------
 soundInit:
@@ -167,7 +171,12 @@ soundMode:
 	.byte 0
 	.space 3
 
-	.section .sbss
+#ifdef GBA
+	.section .sbss				;@ This is EWRAM on GBA with devkitARM
+#else
+	.section .bss
+#endif
+	.align 2
 //SN76496_0:
 //	.space snSize
 FREQTBL:

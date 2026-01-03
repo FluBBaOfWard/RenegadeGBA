@@ -9,10 +9,11 @@
 #include "Gfx.h"
 #include "io.h"
 #include "cpu.h"
+#include "Renegade.h"
 #include "ARM6502/Version.h"
 #include "RenegadeVideo/Version.h"
 
-#define EMUVERSION "V0.1.1 2024-10-10"
+#define EMUVERSION "V0.1.1 2026-01-06"
 
 static void scalingSet(void);
 static const char *getScalingText(void);
@@ -40,6 +41,7 @@ static void cabinetSet(void);
 static const char *getCabinetText(void);
 static void flipSet(void);
 static const char *getFlipText(void);
+static void gammaChange(void);
 
 
 const MItem dummyItems[] = {
@@ -73,7 +75,7 @@ const MItem ctrlItems[] = {
 const MItem displayItems[] = {
 	{"Display: ", scalingSet, getScalingText},
 	{"Scaling: ", flickSet, getFlickText},
-	{"Gamma: ", gammaSet, getGammaText},
+	{"Gamma: ", gammaChange, getGammaText},
 };
 const MItem setItems[] = {
 	{"Speed: ", speedSet, getSpeedText},
@@ -93,13 +95,13 @@ const MItem dipswitchItems[] = {
 	{"Flip Screen: ", flipSet, getFlipText},
 };
 const MItem debugItems[] = {
-	{"Debug Output:", debugTextSet, getDebugText},
-	{"Disable Foreground:", fgrLayerSet, getFgrLayerText},
-	{"Disable Background:", bgrLayerSet, getBgrLayerText},
-	{"Disable Sprites:", sprLayerSet, getSprLayerText},
+	{"Debug Output: ", debugTextSet, getDebugText},
+	{"Disable Foreground: ", fgrLayerSet, getFgrLayerText},
+	{"Disable Background: ", bgrLayerSet, getBgrLayerText},
+	{"Disable Sprites: ", sprLayerSet, getSprLayerText},
 	{"Step Frame", stepFrame},
 };
-const MItem fnList9[] = {
+const MItem fnList9[GAME_COUNT] = {
 	{"Renegade", quickSelectGame},
 	{"Renegade (US bootleg)", quickSelectGame},
 	{"Nekketsu Kouha Kunio-Kun (Japan)", quickSelectGame},
@@ -118,13 +120,11 @@ const Menu menu4 = MENU_M("Display Settings", uiAuto, displayItems);
 const Menu menu5 = MENU_M("Other Settings", uiAuto, setItems);
 const Menu menu6 = MENU_M("Debug", uiAuto, debugItems);
 const Menu menu7 = MENU_M("Dipswitch Settings", uiDipswitches, dipswitchItems);
-const Menu menu8 = MENU_M("Help", uiAbout, dummyItems);
+const Menu menu8 = MENU_M("About", uiAbout, dummyItems);
 const Menu menu9 = MENU_M("Load game", uiAuto, fnList9);
-const Menu menu10 = MENU_M("Exit?", uiAuto, quitItems);
+const Menu menu10 = MENU_M("Quit Emulator?", uiAuto, quitItems);
 
 const Menu *const menus[] = {&menu0, &menu1, &menu2, &menu3, &menu4, &menu5, &menu6, &menu7, &menu8, &menu9, &menu10 };
-
-u8 gGammaValue;
 
 static char *const ctrlTxt[]   = {"1P","2P"};
 static char *const dispTxt[]   = {"Unscaled","Scaled"};
@@ -165,13 +165,14 @@ void uiNullNormal() {
 }
 
 void uiAbout() {
-	setupSubMenu("Help");
-	drawText("Select: Insert coin",3);
-	drawText("Start:  Start button",4);
-	drawText("DPad:   Move character",5);
-	drawText("R:      Jump",6);
-	drawText("B:      Left attack",7);
-	drawText("A:      Right attack",8);
+	setupSubMenuText();
+	drawText("Select:      Insert coin",3);
+	drawText("Start:       Start button",4);
+	drawText("DPad:        Move character",5);
+	drawText("<-<- / ->->: Start running",6);
+	drawText("R:           Jump",7);
+	drawText("B:           Left attack",8);
+	drawText("A:           Right attack",9);
 
 	drawText("RenegadeGBA " EMUVERSION, 17);
 	drawText("ARM6502     " ARM6502VERSION, 18);
@@ -209,7 +210,6 @@ const char *getControllerText() {
 	return ctrlTxt[(joyCfg>>29)&1];
 }
 
-
 /// Swap A & B buttons
 void swapABSet() {
 	joyCfg ^= 0x400;
@@ -225,6 +225,14 @@ void scalingSet(){
 }
 const char *getScalingText() {
 	return dispTxt[gScaling];
+}
+
+/// Change gamma (brightness)
+void gammaChange() {
+	gammaSet();
+	paletteInit(gGammaValue);
+	paletteTxAll();					// Make new palette visible
+	setupMenuPalette();
 }
 
 /// Turn on/off rendering of foreground

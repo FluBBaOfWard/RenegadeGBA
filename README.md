@@ -78,14 +78,18 @@ Restart game.
 
 ## Credits
 
+```text
 Huge thanks to Loopy for the incredible PocketNES, without it this emu would
 probably never have been made.
 Thanks to:
 Dwedit for help and inspiration with a lot of things.
-MAME team for info on hardware.
+The MAME team for information about the hardware.
+```
 
 Fredrik Ahlström
 
-Twitter @TheRealFluBBa
+<https://bsky.app/profile/therealflubba.bsky.social>
 
-<http://www.github.com/FluBBaOfWard>
+<https://www.github.com/FluBBaOfWard>
+
+X/Twitter @TheRealFluBBa

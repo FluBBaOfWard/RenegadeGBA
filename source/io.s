@@ -21,7 +21,11 @@
 	.syntax unified
 	.arm
 
-	.section .ewram,"ax"
+#ifdef GBA
+	.section .ewram, "ax", %progbits	;@ For the GBA
+#else
+	.section .text						;@ For anything else
+#endif
 	.align 2
 ;@----------------------------------------------------------------------------
 ioReset:

@@ -15,8 +15,11 @@
 	.syntax unified
 	.arm
 
-//	.section .text
-	.section .ewram,"ax"
+#ifdef GBA
+	.section .ewram, "ax", %progbits	;@ For the GBA
+#else
+	.section .text						;@ For anything else
+#endif
 	.align 2
 ;@----------------------------------------------------------------------------
 mcuReset:			;@ (r0=0, Renegade. r0!=0, Kuniokun)

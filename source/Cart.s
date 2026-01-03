@@ -301,7 +301,6 @@ m6502MemAps:
 	strcs r4,[r7],#4			;@ writemem_tb
 	strcs r2,[r8],#4			;@ memmap_tbl
 	bne m6502MemAp2
-
 ;@------------------------------------------
 m6502MapperEnd:		;@ Update cpu_pc & lastbank
 ;@------------------------------------------
@@ -322,6 +321,7 @@ cartFlags:
 	.space 3
 
 romStart:
+mainCpu:
 	.long 0
 cpu2Base:
 	.long 0
@@ -335,7 +335,12 @@ adpcmBase:
 	.long 0
 	.pool
 
-	.section .sbss
+#ifdef GBA
+	.section .sbss				;@ This is EWRAM on GBA with devkitARM
+#else
+	.section .bss
+#endif
+	.align 2
 WRMEMTBL_:
 	.space 256*4
 RDMEMTBL_:
@@ -344,6 +349,7 @@ MEMMAPTBL_:
 	.space 256*4
 soundCpuRam:
 	.space 0x1000
+NV_RAM:
 EMU_RAM:
 	.space 0x3200
 	.space CHRBLOCKCOUNT*4
@@ -352,7 +358,7 @@ EMU_RAM:
 testState:
 	.space 0x3208+0x10+0x24
 
-	.section .bss
+	.section .bss				;@ This is IWRAM on GBA with devkitARM
 cpuCache:
 	.space 0x2000
 ;@----------------------------------------------------------------------------

@@ -53,6 +53,7 @@
 		9C50825F25D6EE7100A8E1BA /* Emubase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Emubase.h; sourceTree = "<group>"; };
 		9C9CA7A725F2B69400DC6DF5 /* Renegade.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Renegade.c; sourceTree = "<group>"; };
 		9C9CA7A825F2B69400DC6DF5 /* Renegade.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Renegade.h; sourceTree = "<group>"; };
+		9CBE3EE42F0C022800A4A0FF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9CBEE0D926EE5C960095347A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9CBEE0DA26EE5C9F0095347A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		9CBEE0DB26EE5D760095347A /* EmuSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmuSettings.h; sourceTree = "<group>"; };
@@ -94,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				9C3D5AF225E848BC00E8CD56 /* graphics */,
+				9CBE3EE42F0C022800A4A0FF /* README.md */,
 				9C28401A232D4E7B00C9DCFF /* gba_asm.h */,
 				9CBEE0DB26EE5D760095347A /* EmuSettings.h */,
 				9C41DDB522C7ECF200BD4C64 /* EmuMenu.h */,
@@ -122,8 +124,8 @@
 		9C5081B225CBD52100A8E1BA /* RenegadeVideo */ = {
 			isa = PBXGroup;
 			children = (
-				9CBEE0D926EE5C960095347A /* README.md */,
 				9C5081B825CBD52100A8E1BA /* RenegadeVideo_todo.txt */,
+				9CBEE0D926EE5C960095347A /* README.md */,
 				9C5081B725CBD52100A8E1BA /* History.txt */,
 				9C5081B325CBD52100A8E1BA /* Version.h */,
 				9C5081B525CBD52100A8E1BA /* RenegadeVideo.h */,
