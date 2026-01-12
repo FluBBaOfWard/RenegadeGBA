@@ -317,8 +317,12 @@ oamBufferReady:		.long 0
 reVideo_0:
 	.space renegadeVideoSize
 ;@----------------------------------------------------------------------------
-	.section .ewram, "ax"
-
+#ifdef GBA
+	.section .sbss				;@ This is EWRAM on GBA with devkitARM
+#else
+	.section .bss
+#endif
+	.align 2
 gfxState:
 adjustBlend:
 	.long 0
@@ -329,12 +333,6 @@ windowTop:
 	.byte 0
 	.byte 0,0
 
-#ifdef GBA
-	.section .sbss				;@ This is EWRAM on GBA with devkitARM
-#else
-	.section .bss
-#endif
-	.align 2
 scrollTemp:
 	.space 0x400*2
 OAM_BUFFER1:

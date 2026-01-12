@@ -34,14 +34,15 @@ int loadSettings() {
 	if (findFolder(folderName)) {
 		return 1;
 	}
-	if ( (file = fopen(settingName, "r")) ) {
+	if ((file = fopen(settingName, "r"))) {
 		fread(&cfg, 1, sizeof(ConfigData), file);
 		fclose(file);
 		if (!strstr(cfg.magic,"cfg")) {
 			infoOutput("Error in settings file.");
 			return 1;
 		}
-	} else {
+	}
+	else {
 		infoOutput("Couldn't open file:");
 		infoOutput(settingName);
 		return 1;
@@ -79,11 +80,12 @@ void saveSettings() {
 	if (findFolder(folderName)) {
 		return;
 	}
-	if ( (file = fopen(settingName, "w")) ) {
+	if ((file = fopen(settingName, "w"))) {
 		fwrite(&cfg, 1, sizeof(ConfigData), file);
 		fclose(file);
 		infoOutput("Settings saved.");
-	} else {
+	}
+	else {
 		infoOutput("Couldn't open file:");
 		infoOutput(settingName);
 	}*/
@@ -116,13 +118,14 @@ void loadState(void) {
 	strlcpy(stateName, gameNames[selectedGame], sizeof(stateName));
 	strlcat(stateName, ".sta", sizeof(stateName));
 	int stateSize = getStateSize();
-	if ( (file = fopen(stateName, "r")) ) {
-		if ( (statePtr = malloc(stateSize)) ) {
+	if ((file = fopen(stateName, "r"))) {
+		if ((statePtr = malloc(stateSize))) {
 			fread(statePtr, 1, stateSize, file);
 			unpackState(statePtr);
 			free(statePtr);
 			infoOutput("Loaded state.");
-		} else {
+		}
+		else {
 			infoOutput("Couldn't alloc mem for state.");
 		}
 		fclose(file);
@@ -140,13 +143,14 @@ void saveState(void) {
 	strlcpy(stateName, gameNames[selectedGame], sizeof(stateName));
 	strlcat(stateName, ".sta", sizeof(stateName));
 	int stateSize = getStateSize();
-	if ( (file = fopen(stateName, "w")) ) {
-		if ( (statePtr = malloc(stateSize)) ) {
+	if ((file = fopen(stateName, "w"))) {
+		if ((statePtr = malloc(stateSize))) {
 			packState(statePtr);
 			fwrite(statePtr, 1, stateSize, file);
 			free(statePtr);
 			infoOutput("Saved state.");
-		} else {
+		}
+		else {
 			infoOutput("Couldn't alloc mem for state.");
 		}
 		fclose(file);
@@ -183,16 +187,17 @@ bool loadRoms(int game, bool doLoad) {
 
 	for (i=0; i<count; i++) {
 		found = false;
-		if ( (file = fopen(romFilenames[game][i], "r")) ) {
+		if ((file = fopen(romFilenames[game][i], "r"))) {
 			if (doLoad) {
 				fread(romArea, 1, romFilesizes[game][i], file);
 				romArea += romFilesizes[game][i];
 			}
 			fclose(file);
 			found = true;
-		} else {
+		}
+		else {
 			for (j=0; j<GAMECOUNT; j++) {
-				if ( !(findFileInZip(gameZipNames[j], romFilenames[game][i])) ) {
+				if (!(findFileInZip(gameZipNames[j], romFilenames[game][i]))) {
 					if (doLoad) {
 						loadFileInZip(romArea, gameZipNames[j], romFilenames[game][i], romFilesizes[game][i]);
 						romArea += romFilesizes[game][i];
