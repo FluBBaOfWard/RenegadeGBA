@@ -13,7 +13,7 @@
 #include "ARM6502/Version.h"
 #include "RenegadeVideo/Version.h"
 
-#define EMUVERSION "V0.1.1 2026-01-06"
+#define EMUVERSION "V0.1.1 2026-01-17"
 
 static void scalingSet(void);
 static const char *getScalingText(void);
@@ -138,7 +138,6 @@ static char *const cabTxt[]    = {"Cocktail","Upright"};
 
 /// This is called at the start of the emulator
 void setupGUI() {
-	emuSettings = AUTOPAUSE_EMULATION;
 //	keysSetRepeat(25, 4);	// Delay, repeat.
 	menu1.itemCount = ARRSIZE(mainItems) - (enableExit?0:1);
 	closeMenu();

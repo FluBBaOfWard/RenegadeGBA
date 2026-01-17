@@ -1,10 +1,5 @@
 #include <gba.h>
-
-//#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/dir.h>
 
 #include "FileHandling.h"
 #include "Shared/EmuMenu.h"
@@ -20,7 +15,7 @@
 static const char *const folderName = "acds";
 static const char *const settingName = "settings.cfg";
 
-ConfigData cfg;
+EWRAM_BSS ConfigData cfg;
 static int selectedGame = 0;
 
 static bool loadRoms(int gamenr, bool doLoad);
@@ -28,67 +23,59 @@ static bool loadRoms(int gamenr, bool doLoad);
 #define GAMECOUNT (3)
 
 //---------------------------------------------------------------------------------
-int loadSettings() {
-//	FILE *file;
-/*
-	if (findFolder(folderName)) {
-		return 1;
-	}
-	if ((file = fopen(settingName, "r"))) {
-		fread(&cfg, 1, sizeof(ConfigData), file);
-		fclose(file);
-		if (!strstr(cfg.magic,"cfg")) {
-			infoOutput("Error in settings file.");
-			return 1;
-		}
-	}
-	else {
-		infoOutput("Couldn't open file:");
-		infoOutput(settingName);
-		return 1;
-	}
-*/
-	gDipSwitch0 = cfg.dipSwitch0;
-	gDipSwitch1 = cfg.dipSwitch1;
-	gDipSwitch2 = cfg.dipSwitch2;
+void applyConfigData(void) {
+	emuSettings = cfg.emuSettings & ~EMUSPEED_MASK; // Clear speed setting.
 	gScaling    = cfg.scaling & 1;
 	gFlicker    = cfg.flicker & 1;
 	gGammaValue = cfg.gammaValue;
-	emuSettings = cfg.emuSettings &~ EMUSPEED_MASK; // Clear speed setting.
 	sleepTime   = cfg.sleepTime;
-	joyCfg      = (joyCfg & ~0x400)|((cfg.controller&1)<<10);
-//	strlcpy(currentDir, cfg.currentPath, sizeof(currentDir));
-
-	infoOutput("Settings loaded.");
-	return 0;
+	joyCfg      = (joyCfg & ~0x400) | ((cfg.controller & 1) << 10);
+	gDipSwitch0 = cfg.dipSwitch0;
+	gDipSwitch1 = cfg.dipSwitch1;
+	gDipSwitch2 = cfg.dipSwitch2;
 }
-void saveSettings() {
-//	FILE *file;
 
-	strcpy(cfg.magic,"cfg");
-	cfg.dipSwitch0  = gDipSwitch0;
-	cfg.dipSwitch1  = gDipSwitch1;
-	cfg.dipSwitch2  = gDipSwitch2;
+void updateConfigData(void) {
+	strcpy(cfg.magic, "cfg");
+	cfg.emuSettings = emuSettings & ~EMUSPEED_MASK; // Clear speed setting.
 	cfg.scaling     = gScaling & 1;
 	cfg.flicker     = gFlicker & 1;
 	cfg.gammaValue  = gGammaValue;
-	cfg.emuSettings = emuSettings & ~EMUSPEED_MASK; // Clear speed setting.
 	cfg.sleepTime   = sleepTime;
-	cfg.controller  = (joyCfg>>10)&1;
-//	strlcpy(cfg.currentPath, currentDir, sizeof(currentDir));
-/*
-	if (findFolder(folderName)) {
-		return;
-	}
-	if ((file = fopen(settingName, "w"))) {
-		fwrite(&cfg, 1, sizeof(ConfigData), file);
-		fclose(file);
-		infoOutput("Settings saved.");
+	cfg.controller  = (joyCfg >> 10) & 1;
+	cfg.dipSwitch0  = gDipSwitch0;
+	cfg.dipSwitch1  = gDipSwitch1;
+	cfg.dipSwitch2  = gDipSwitch2;
+}
+
+void initSettings() {
+	memset(&cfg, 0, sizeof(ConfigData));
+	cfg.emuSettings = AUTOPAUSE_EMULATION | AUTOLOAD_NVRAM;
+	cfg.scaling     = SCALED;
+	cfg.flicker     = 1;
+	cfg.sleepTime   = 60*60*5;
+	cfg.dipSwitch1  = 0x50;		// Coins, lives, bonus, cabinet & flip.
+
+	applyConfigData();
+}
+
+int loadSettings() {
+	bytecopy_((u8 *)&cfg, (u8 *)SRAM+0x10000-sizeof(ConfigData), sizeof(ConfigData));
+	if (strstr(cfg.magic, "cfg")) {
+		applyConfigData();
+		infoOutput("Settings loaded.");
+		return 0;
 	}
 	else {
-		infoOutput("Couldn't open file:");
-		infoOutput(settingName);
-	}*/
+		updateConfigData();
+		infoOutput("Error in settings file.");
+	}
+	return 1;
+}
+void saveSettings() {
+	updateConfigData();
+
+	bytecopy_((u8 *)SRAM+0x10000-sizeof(ConfigData), (u8 *)&cfg, sizeof(ConfigData));
 	infoOutput("Settings saved.");
 }
 
